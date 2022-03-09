@@ -7,8 +7,8 @@ import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name="TB_USUARIO")
-public class Usuario implements Serializable {
+@Table(name="TB_USER")
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,13 +16,13 @@ public class Usuario implements Serializable {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    @Column(name = "nome")
-    private String nome;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "cpf")
     private Integer cpf;
 
-    @Column(name = "senha")
-    private String senha;
+    @Column(name = "key")
+    private String key;
 
 }

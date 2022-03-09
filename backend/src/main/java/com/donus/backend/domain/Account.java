@@ -7,8 +7,8 @@ import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name="TB_CONTA")
-public class Conta implements Serializable {
+@Table(name="TB_ACCOUNT")
+public class Account implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,10 +16,10 @@ public class Conta implements Serializable {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    @Column(name = "saldo")
-    private String saldo;
+    @Column(name = "balance")
+    private Double balance;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Usuario usuario;
+    private User user;
 
 }

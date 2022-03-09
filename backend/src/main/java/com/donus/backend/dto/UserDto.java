@@ -3,9 +3,9 @@ package com.donus.backend.dto;
 import lombok.Data;
 
 @Data
-public class UsuarioDto {
+public class UserDto {
 
-    private String nome;
+    private String name;
     private Integer cpf;
 
 }
