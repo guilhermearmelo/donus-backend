@@ -22,4 +22,7 @@ public class Usuario implements Serializable {
     @Column(name = "cpf")
     private Integer cpf;
 
+    @Column(name = "senha")
+    private String senha;
+
 }
