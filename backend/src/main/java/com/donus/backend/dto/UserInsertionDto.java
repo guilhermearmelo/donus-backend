@@ -4,16 +4,18 @@ import com.donus.backend.domain.User;
 import lombok.Data;
 
 @Data
-public class UserDto {
+public class UserInsertionDto {
 
     private String name;
     private String cpf;
+    private String password;
 
-    public UserDto(){}
+    public UserInsertionDto(){}
 
-    public UserDto(User user) {
+    public UserInsertionDto(User user) {
         this.name = user.getName();
         this.cpf = user.getCpf();
+        this.password = user.getPassword();
     }
 
 }

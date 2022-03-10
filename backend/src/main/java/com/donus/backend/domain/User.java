@@ -1,5 +1,6 @@
 package com.donus.backend.domain;
 
+import com.donus.backend.dto.UserDto;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,9 +21,22 @@ public class User implements Serializable {
     private String name;
 
     @Column(name = "cpf")
-    private Integer cpf;
+    private String cpf;
 
-    @Column(name = "key")
-    private String key;
+    @Column(name = "password")
+    private String password;
+
+    public User(){}
+
+    public User(String name, String cpf) {
+        this.name = name;
+        this.cpf = cpf;
+    }
+
+    public User(String name, String cpf, String password) {
+        this.name = name;
+        this.cpf = cpf;
+        this.password = password;
+    }
 
 }
