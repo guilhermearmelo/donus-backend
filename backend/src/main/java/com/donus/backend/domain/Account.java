@@ -16,11 +16,25 @@ public class Account implements Serializable {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
+    @Column(name = "code", unique=true)
+    private String code;
+
     @Column(name = "balance")
     private Double balance;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique=true)
     private User user;
+
+    public Account(){}
+
+    public Account(String code, Double balance){
+        this.code = code;
+        this.balance = balance;
+    }
+
+    public boolean hasMoney(Double amount){
+        return amount <= this.getBalance();
+    }
 
 }

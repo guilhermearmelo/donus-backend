@@ -44,7 +44,6 @@ public class UserService {
     }
 
     public List<UserDto> findAll() {
-
         List<User> userList;
         List<UserDto> userDtoList = new ArrayList<>();
 
