@@ -3,13 +3,18 @@ package com.donus.backend.service;
 import com.donus.backend.domain.Account;
 import com.donus.backend.domain.User;
 import com.donus.backend.dto.*;
+import com.donus.backend.exceptions.*;
 import com.donus.backend.repository.AccountRepository;
 import com.donus.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AccountService {
@@ -20,20 +25,55 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    public AccountDto insert(AccountInsertionDto accountInsertionDto) {
+    public ResponseEntity<Object> insert(AccountInsertionDto accountInsertionDto) {
         Account account = this.parseDtoToEntity(accountInsertionDto);
+        BaseResponseDto baseResponseDto = new BaseResponseDto();
 
-        return parseEntityToDto(accountRepository.save(account));
+        try{
+            if(accountRepository.findByUser(accountInsertionDto.getUserId()) != null)
+                throw new UserAlreadyHasAnAccountException();
+            if(accountRepository.findByCode(accountInsertionDto.getAccountId()) != null)
+                throw new AccountAlreadyExistsException();
+
+            baseResponseDto.setData(parseEntityToDto(accountRepository.save(account)));
+            baseResponseDto.setMessage("Account successfully created!");
+            baseResponseDto.setStatusCode(HttpStatus.CREATED.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.CREATED);
+        } catch (UserAlreadyHasAnAccountException e){
+            baseResponseDto.setMessage(new UserAlreadyHasAnAccountException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.CONFLICT.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.CONFLICT);
+        } catch (AccountAlreadyExistsException e){
+            baseResponseDto.setMessage(new AccountAlreadyExistsException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.CONFLICT.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.CONFLICT);
+        }
     }
 
-    public void remove(long id) {
-        Account account = accountRepository.findById(id);
-        accountRepository.delete(account);
+    public ResponseEntity<Object> remove(long id) {
+        BaseResponseDto baseResponseDto = new BaseResponseDto();
+
+        try{
+            if(accountRepository.findById(id) == null)
+                throw new AccountNotFoundException();
+
+            Account account = accountRepository.findById(id);
+            accountRepository.delete(account);
+
+            baseResponseDto.setMessage("Account successfully deleted!");
+            baseResponseDto.setStatusCode(HttpStatus.OK.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
+        } catch (AccountNotFoundException e) {
+            baseResponseDto.setMessage(new AccountNotFoundException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.NOT_FOUND);
+        }
     }
 
-    public List<AccountDto> findAll() {
+    public ResponseEntity<Object> findAll() {
         List<Account> accountList;
         List<AccountDto> accountDtoList = new ArrayList<>();
+        BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         accountList = accountRepository.findAll();
         for(Account account: accountList) {
@@ -41,44 +81,116 @@ public class AccountService {
             accountDtoList.add(accountDto);
         }
 
-        return accountDtoList;
+        baseResponseDto.setData(accountDtoList);
+        baseResponseDto.setStatusCode(HttpStatus.OK.value());
+
+        if(accountDtoList.isEmpty()){
+            baseResponseDto.setMessage("No account was found!");
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
+        }
+
+        baseResponseDto.setMessage("Accounts found!");
+        return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
     }
 
-    public AccountDto findById(long id) {
-        Account account = accountRepository.findById(id);
+    public ResponseEntity<Object> findById(long id) {
+        BaseResponseDto baseResponseDto = new BaseResponseDto();
 
-        return parseEntityToDto(account);
+        try{
+            if(accountRepository.findById(id) == null)
+                throw new AccountNotFoundException();
+
+            Account account = accountRepository.findById(id);
+
+            baseResponseDto.setData(parseEntityToDto(account));
+            baseResponseDto.setMessage("Account found!");
+            baseResponseDto.setStatusCode(HttpStatus.OK.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
+        } catch (AccountNotFoundException e){
+            baseResponseDto.setMessage(new AccountNotFoundException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.NOT_FOUND);
+        }
     }
 
-    public AccountDto doTransaction(TransactionDto transactionDto) {
-        Account source = accountRepository.findByCode(transactionDto.getSourceAccount());
-        Account target = accountRepository.findByCode(transactionDto.getTargetAccount());
-        Double amount = transactionDto.getAmount();
-        AccountDto accountDto = new AccountDto(source);
+    public ResponseEntity<Object> doTransaction(TransactionDto transactionDto) {
+        BaseResponseDto baseResponseDto = new BaseResponseDto();
 
-        if(!source.hasMoney(amount)) return accountDto;
-        if(amount <= 0) return accountDto;
+        try{
+            if(accountRepository.findByCode(transactionDto.getSourceAccount()) == null)
+                throw new AccountNotFoundException();
+            if(accountRepository.findByCode(transactionDto.getTargetAccount()) == null)
+                throw new AccountNotFoundException();
 
-        source.setBalance(source.getBalance() - amount);
-        target.setBalance(target.getBalance() + amount);
+            Account source = accountRepository.findByCode(transactionDto.getSourceAccount());
+            Account target = accountRepository.findByCode(transactionDto.getTargetAccount());
+            Double amount = transactionDto.getAmount();
 
-        accountRepository.save(source);
-        accountRepository.save(target);
+            Pattern p = Pattern.compile("^[1-9]\\d*(\\.\\d+)?$");
+            Matcher m = p.matcher(amount.toString());
 
-        return new AccountDto(source);
+            if(!source.hasMoney(amount))
+                throw new NotEnoughMoneyException();
+            if(!m.matches())
+                throw new AmountDoesntMatchPatternException();
+
+            source.setBalance(source.getBalance() - amount);
+            target.setBalance(target.getBalance() + amount);
+
+            accountRepository.save(source);
+            accountRepository.save(target);
+
+            baseResponseDto.setData(new AccountDto(source));
+            baseResponseDto.setMessage("Transaction completed successfully!");
+            baseResponseDto.setStatusCode(HttpStatus.OK.value());
+
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
+        } catch(AccountNotFoundException e){
+            baseResponseDto.setMessage(new AccountNotFoundException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.NOT_FOUND);
+        } catch(NotEnoughMoneyException e){
+            baseResponseDto.setMessage(new NotEnoughMoneyException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.BAD_REQUEST);
+        } catch(AmountDoesntMatchPatternException e){
+            baseResponseDto.setMessage(new AmountDoesntMatchPatternException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.BAD_REQUEST);
+        }
     }
 
-    public AccountDto makeDeposit(DepositDto depositDto) {
-        Account target = accountRepository.findByCode(depositDto.getTargetAccount());
+    public ResponseEntity<Object> makeDeposit(DepositDto depositDto) {
+        BaseResponseDto baseResponseDto = new BaseResponseDto();
         Double amount = depositDto.getAmount();
 
-        if(!((0<amount)&&(amount<=2000))) return new AccountDto(target);
+        try{
+            if(accountRepository.findByCode(depositDto.getTargetAccount()) == null)
+                throw new AccountNotFoundException();
 
-        target.setBalance(target.getBalance() + amount);
+            Account target = accountRepository.findByCode(depositDto.getTargetAccount());
 
-        accountRepository.save(target);
+            if(!((0<amount)&&(amount<=2000)))
+                throw new WrongValueForDepositException();
 
-        return new AccountDto(target);
+
+            target.setBalance(target.getBalance() + amount);
+            accountRepository.save(target);
+            baseResponseDto.setData(new AccountDto(target));
+            baseResponseDto.setMessage("Deposit successfully done!");
+            baseResponseDto.setStatusCode(HttpStatus.CREATED.value());
+
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
+        } catch(AccountNotFoundException e){
+            baseResponseDto.setMessage(new AccountNotFoundException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.BAD_REQUEST);
+        } catch(WrongValueForDepositException e){
+            baseResponseDto.setMessage(new WrongValueForDepositException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     public Account parseDtoToEntity(AccountDto accountDto) {
