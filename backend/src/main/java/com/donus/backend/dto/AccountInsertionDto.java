@@ -8,12 +8,14 @@ public class AccountInsertionDto {
     private String accountId;
     private Double balance;
     private Long userId;
+    private String password;
 
     public AccountInsertionDto(){}
 
-    public AccountInsertionDto(Account account, Long id){
+    public AccountInsertionDto(Account account, Long id, String password){
         this.accountId = account.getCode();
         this.balance = account.getBalance();
         this.userId = id;
+        this.password = password;
     }
 }

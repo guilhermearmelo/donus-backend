@@ -25,11 +25,16 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuthService authService;
+
     public ResponseEntity<Object> insert(AccountInsertionDto accountInsertionDto) {
         Account account = this.parseDtoToEntity(accountInsertionDto);
         BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         try{
+            if(!authService.validateUserPassword(accountInsertionDto.getPassword(), accountInsertionDto.getUserId()))
+                throw new AuthenticationException();
             if(accountRepository.findByUser(accountInsertionDto.getUserId()) != null)
                 throw new UserAlreadyHasAnAccountException();
             if(accountRepository.findByCode(accountInsertionDto.getAccountId()) != null)
@@ -47,6 +52,10 @@ public class AccountService {
             baseResponseDto.setMessage(new AccountAlreadyExistsException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.CONFLICT.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.CONFLICT);
+        } catch (AuthenticationException e){
+            baseResponseDto.setMessage(new AuthenticationException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -121,6 +130,8 @@ public class AccountService {
                 throw new AccountNotFoundException();
             if(accountRepository.findByCode(transactionDto.getTargetAccount()) == null)
                 throw new AccountNotFoundException();
+            if(!authService.validateUserAccount(transactionDto.getSourceAccount(), transactionDto.getUserKey()))
+                throw new AuthenticationException();
 
             Account source = accountRepository.findByCode(transactionDto.getSourceAccount());
             Account target = accountRepository.findByCode(transactionDto.getTargetAccount());
@@ -157,6 +168,10 @@ public class AccountService {
             baseResponseDto.setMessage(new AmountDoesntMatchPatternException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.BAD_REQUEST);
+        } catch(AuthenticationException e){
+            baseResponseDto.setMessage(new AuthenticationException().getMessage());
+            baseResponseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+            return new ResponseEntity<>(baseResponseDto, HttpStatus.UNAUTHORIZED);
         }
     }
 
