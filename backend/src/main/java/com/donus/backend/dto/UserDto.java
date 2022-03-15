@@ -2,6 +2,7 @@ package com.donus.backend.dto;
 
 import com.donus.backend.domain.User;
 import lombok.Data;
+import org.springframework.data.domain.Page;
 
 @Data
 public class UserDto {
@@ -16,4 +17,7 @@ public class UserDto {
         this.cpf = user.getCpf();
     }
 
+    public static Page<UserDto> converter(Page<User> userList) {
+        return userList.map(UserDto::new);
+    }
 }

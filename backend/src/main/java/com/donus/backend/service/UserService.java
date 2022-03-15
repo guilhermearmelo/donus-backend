@@ -1,5 +1,6 @@
 package com.donus.backend.service;
 
+import com.donus.backend.domain.Account;
 import com.donus.backend.domain.User;
 import com.donus.backend.dto.BaseResponseDto;
 import com.donus.backend.dto.UserDto;
@@ -10,6 +11,8 @@ import com.donus.backend.exceptions.NoFieldsToUpdateException;
 import com.donus.backend.exceptions.UserNotFoundException;
 import com.donus.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -124,24 +127,18 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> findAll() {
-        List<User> userList;
-        List<UserDto> userDtoList = new ArrayList<>();
+    public ResponseEntity<Object> findAll(Pageable pageable) {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
+        Page<User> userList = userRepository.findAll(pageable);
+        baseResponseDto.setData(UserDto.converter(userList));
 
-        userList = userRepository.findAll();
-        for(User user: userList) {
-            UserDto userDto = this.parseEntityToDto(user);
-            userDtoList.add(userDto);
-        }
-
-        baseResponseDto.setData(userDtoList);
-        baseResponseDto.setStatusCode(HttpStatus.OK.value());
-
-        if(userDtoList.isEmpty()){
+        if(userList.isEmpty()){
+            baseResponseDto.setStatusCode(HttpStatus.OK.value());
             baseResponseDto.setMessage("No user was found!");
             return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
         }
+
+        baseResponseDto.setStatusCode(HttpStatus.OK.value());
         baseResponseDto.setMessage("Users found!");
         return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
     }

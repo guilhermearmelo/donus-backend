@@ -4,10 +4,14 @@ import com.donus.backend.dto.*;
 import com.donus.backend.service.AccountService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(value="/api")
@@ -31,8 +35,8 @@ public class AccountController {
 
     @GetMapping("/accounts")
     @ApiOperation(value = "Returns a list of all accounts")
-    public ResponseEntity<Object> listUsers(){
-        return accountService.findAll();
+    public ResponseEntity<Object> listUsers(@PageableDefault(sort="id", direction=Sort.Direction.DESC, page=0, size=10) Pageable pageable){
+        return accountService.findAll(pageable);
     }
 
     @GetMapping("/account/{id}")

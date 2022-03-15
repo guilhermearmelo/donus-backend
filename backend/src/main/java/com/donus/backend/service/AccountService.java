@@ -7,6 +7,9 @@ import com.donus.backend.exceptions.*;
 import com.donus.backend.repository.AccountRepository;
 import com.donus.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -79,25 +82,18 @@ public class AccountService {
         }
     }
 
-    public ResponseEntity<Object> findAll() {
-        List<Account> accountList;
-        List<AccountDto> accountDtoList = new ArrayList<>();
+    public ResponseEntity<Object> findAll(Pageable pageable) {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
+        Page<Account> accountList = accountRepository.findAll(pageable);
+        baseResponseDto.setData(AccountDto.converter(accountList));
 
-        accountList = accountRepository.findAll();
-        for(Account account: accountList) {
-            AccountDto accountDto = this.parseEntityToDto(account);
-            accountDtoList.add(accountDto);
-        }
-
-        baseResponseDto.setData(accountDtoList);
-        baseResponseDto.setStatusCode(HttpStatus.OK.value());
-
-        if(accountDtoList.isEmpty()){
+        if(accountList.isEmpty()){
+            baseResponseDto.setStatusCode(HttpStatus.OK.value());
             baseResponseDto.setMessage("No account was found!");
             return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
         }
 
+        baseResponseDto.setStatusCode(HttpStatus.OK.value());
         baseResponseDto.setMessage("Accounts found!");
         return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
     }
