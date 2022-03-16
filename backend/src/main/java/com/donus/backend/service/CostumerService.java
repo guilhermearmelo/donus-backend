@@ -1,47 +1,51 @@
 package com.donus.backend.service;
 
-import com.donus.backend.domain.User;
+import com.donus.backend.domain.Costumer;
 import com.donus.backend.dto.BaseResponseDto;
-import com.donus.backend.dto.UserDto;
-import com.donus.backend.dto.UserInsertionDto;
+import com.donus.backend.dto.CostumerDto;
+import com.donus.backend.dto.CostumerInsertionDto;
 import com.donus.backend.exceptions.CpfAlreadyExistsException;
 import com.donus.backend.exceptions.CpfDoesntMatchPatternException;
 import com.donus.backend.exceptions.NoFieldsToUpdateException;
-import com.donus.backend.exceptions.UserNotFoundException;
-import com.donus.backend.repository.UserRepository;
+import com.donus.backend.exceptions.CostumerNotFoundException;
+import com.donus.backend.repository.CostumerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class UserService {
+public class CostumerService {
 
     @Autowired
-    private UserRepository userRepository;
+    private CostumerRepository costumerRepository;
 
-    public ResponseEntity<Object> insert(UserInsertionDto userInsertionDto) {
-        User user = this.parseDtoToEntity(userInsertionDto);
+    public ResponseEntity<Object> insert(CostumerInsertionDto costumerInsertionDto) {
+        Costumer costumer = this.parseDtoToEntity(costumerInsertionDto);
         BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         try{
             Pattern p = Pattern.compile("(^\\d{3}\\x2E\\d{3}\\x2E\\d{3}\\x2D\\d{2}$)");
-            Matcher m = p.matcher((user.getCpf()));
+            Matcher m = p.matcher((costumer.getCpf()));
 
             if(!m.matches())
                 throw new CpfDoesntMatchPatternException();
 
-            if(userRepository.findByCpf(user.getCpf()) != null )
+            if(costumerRepository.findByCpf(costumer.getCpf()).isPresent())
                 throw new CpfAlreadyExistsException();
 
-            baseResponseDto.setData(parseEntityToDto(userRepository.save(user)));
-            baseResponseDto.setMessage("User successfully inserted!");
+            costumer.setPassword(new BCryptPasswordEncoder().encode(costumer.getPassword()));
+            baseResponseDto.setData(parseEntityToDto(costumerRepository.save(costumer)));
+            costumerRepository.grantCostumerProfile(costumerRepository.findByCpf(costumerInsertionDto.getCpf()).get().getId(), 2);
+
+            baseResponseDto.setMessage("Costumer successfully inserted!");
             baseResponseDto.setStatusCode(HttpStatus.CREATED.value());
 
             return new ResponseEntity<>(baseResponseDto, HttpStatus.CREATED);
@@ -56,37 +60,37 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> update(long id, UserDto userDto) {
+    public ResponseEntity<Object> update(long id, CostumerDto costumerDto) {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         try{
-            if(userRepository.findById(id) == null)
-                throw new UserNotFoundException();
+            if(costumerRepository.findById(id) == null)
+                throw new CostumerNotFoundException();
 
-            if(userDto.getCpf() == null && userDto.getName() == null ||
-                    Objects.equals(userDto.getCpf(), "") && Objects.equals(userDto.getName(), ""))
+            if(costumerDto.getCpf() == null && costumerDto.getName() == null ||
+                    Objects.equals(costumerDto.getCpf(), "") && Objects.equals(costumerDto.getName(), ""))
                 throw new NoFieldsToUpdateException();
 
             Pattern p = Pattern.compile("(^\\d{3}\\x2E\\d{3}\\x2E\\d{3}\\x2D\\d{2}$)");
-            Matcher m = p.matcher((userDto.getCpf()));
+            Matcher m = p.matcher((costumerDto.getCpf()));
 
             if(!m.matches())
                 throw new CpfDoesntMatchPatternException();
 
-            if(userRepository.findByCpf(userDto.getCpf()) != null )
+            if(costumerRepository.findByCpf(costumerDto.getCpf()).isPresent())
                 throw new CpfAlreadyExistsException();
 
-            User user = userRepository.findById(id);
-            if(userDto.getCpf() != null) user.setCpf(userDto.getCpf());
-            if(userDto.getName() != null) user.setName(userDto.getName());
+            Costumer costumer = costumerRepository.findById(id);
+            if(costumerDto.getCpf() != null) costumer.setCpf(costumerDto.getCpf());
+            if(costumerDto.getName() != null) costumer.setName(costumerDto.getName());
 
-            baseResponseDto.setData(parseEntityToDto(userRepository.save(user)));
-            baseResponseDto.setMessage("User successfully updated!");
+            baseResponseDto.setData(parseEntityToDto(costumerRepository.save(costumer)));
+            baseResponseDto.setMessage("Costumer successfully updated!");
             baseResponseDto.setStatusCode(HttpStatus.OK.value());
 
             return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
-        } catch (UserNotFoundException e){
-            baseResponseDto.setMessage(new UserNotFoundException().getMessage());
+        } catch (CostumerNotFoundException e){
+            baseResponseDto.setMessage(new CostumerNotFoundException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.NOT_FOUND);
         } catch (NoFieldsToUpdateException e) {
@@ -108,41 +112,35 @@ public class UserService {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         try{
-            if(userRepository.findById(id) == null)
-                throw new UserNotFoundException();
+            if(costumerRepository.findById(id) == null)
+                throw new CostumerNotFoundException();
 
-            User user = userRepository.findById(id);
+            Costumer costumer = costumerRepository.findById(id);
 
-            baseResponseDto.setData(new UserDto(user));
-            baseResponseDto.setMessage("User found!");
+            baseResponseDto.setData(new CostumerDto(costumer));
+            baseResponseDto.setMessage("Costumer found!");
             baseResponseDto.setStatusCode(HttpStatus.OK.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
-        } catch (UserNotFoundException e){
-            baseResponseDto.setMessage(new UserNotFoundException().getMessage());
+        } catch (CostumerNotFoundException e){
+            baseResponseDto.setMessage(new CostumerNotFoundException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<Object> findAll() {
-        List<User> userList;
-        List<UserDto> userDtoList = new ArrayList<>();
+    public ResponseEntity<Object> findAll(Pageable pageable) {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
+        Page<Costumer> userList = costumerRepository.findAll(pageable);
+        baseResponseDto.setData(CostumerDto.converter(userList));
 
-        userList = userRepository.findAll();
-        for(User user: userList) {
-            UserDto userDto = this.parseEntityToDto(user);
-            userDtoList.add(userDto);
-        }
-
-        baseResponseDto.setData(userDtoList);
-        baseResponseDto.setStatusCode(HttpStatus.OK.value());
-
-        if(userDtoList.isEmpty()){
-            baseResponseDto.setMessage("No user was found!");
+        if(userList.isEmpty()){
+            baseResponseDto.setStatusCode(HttpStatus.OK.value());
+            baseResponseDto.setMessage("No costumer was found!");
             return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
         }
-        baseResponseDto.setMessage("Users found!");
+
+        baseResponseDto.setStatusCode(HttpStatus.OK.value());
+        baseResponseDto.setMessage("Costumers found!");
         return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
     }
 
@@ -150,38 +148,35 @@ public class UserService {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         try{
-            if(userRepository.findById(id) == null)
-                throw new UserNotFoundException();
+            if(costumerRepository.findById(id) == null)
+                throw new CostumerNotFoundException();
 
-            User user = userRepository.findById(id);
-            userRepository.delete(user);
+            Costumer costumer = costumerRepository.findById(id);
+            costumerRepository.delete(costumer);
 
-            baseResponseDto.setMessage("User successfully deleted!");
+            baseResponseDto.setMessage("Costumer successfully deleted!");
             baseResponseDto.setStatusCode(HttpStatus.OK.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            baseResponseDto.setMessage(new UserNotFoundException().getMessage());
+        } catch (CostumerNotFoundException e) {
+            baseResponseDto.setMessage(new CostumerNotFoundException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.NOT_FOUND);
         }
     }
 
-    public User parseDtoToEntity(UserDto userDto) {
-        User user = new User(userDto.getName(), userDto.getCpf());
+    public Costumer parseDtoToEntity(CostumerDto costumerDto) {
 
-        return user;
+        return new Costumer(costumerDto.getName(), costumerDto.getCpf());
     }
 
-    public User parseDtoToEntity(UserInsertionDto userInsertionDto) {
-        User user = new User(userInsertionDto.getName(), userInsertionDto.getCpf(), userInsertionDto.getPassword());
+    public Costumer parseDtoToEntity(CostumerInsertionDto costumerInsertionDto) {
 
-        return user;
+        return new Costumer(costumerInsertionDto.getName(), costumerInsertionDto.getCpf(), costumerInsertionDto.getPassword());
     }
 
-    public UserDto parseEntityToDto(User user){
-        UserDto userDto = new UserDto(user);
+    public CostumerDto parseEntityToDto(Costumer costumer){
 
-        return userDto;
+        return new CostumerDto(costumer);
     }
 
 }

@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "9d577284-00d7-4e1f-8e89-532e54d43e40",
 		"name": "Donus Backend Documentation - Guilherme Melo",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -11,6 +11,16 @@
 				{
 					"name": "Creates an account for a given user Id",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDczOTIwOTIsImV4cCI6MTY0NzQ3ODQ5Mn0.yRf6V8qheatmsb9sm0jw5cSXKpIFmd4GMN0coHJInWA",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -24,15 +34,36 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"accountId\": \"555\", \"balance\": 0, \"password\": \"pass2\", \"userId\": 8}"
+							"raw": "{ \"accountId\": \"111\", \"balance\": 0, \"password\": \"1234\", \"userId\": 1}"
 						},
-						"url": "http://localhost:8080/api/account"
+						"url": {
+							"raw": "http://localhost:8080/api/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"account"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": " Returns one account given an id",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDc0MDI1MDcsImV4cCI6MTY0NzQ4ODkwN30.IvQT6CGrUqn4gqivUZzussUMuz4GZOB_z3BEdtyfGsw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -40,13 +71,35 @@
 								"value": "*/*"
 							}
 						],
-						"url": "http://localhost:8080/api/account/1"
+						"url": {
+							"raw": "http://localhost:8080/api/account/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"account",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Returns a list of all accounts",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDc0MDI1MDcsImV4cCI6MTY0NzQ4ODkwN30.IvQT6CGrUqn4gqivUZzussUMuz4GZOB_z3BEdtyfGsw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -54,7 +107,18 @@
 								"value": "*/*"
 							}
 						],
-						"url": "http://localhost:8080/api/accounts"
+						"url": {
+							"raw": "http://localhost:8080/api/accounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -76,13 +140,34 @@
 							"mode": "raw",
 							"raw": "{ \"amount\": 0, \"targetAccount\": \"string\"}"
 						},
-						"url": "http://localhost:8080/api/deposit"
+						"url": {
+							"raw": "http://localhost:8080/api/deposit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deposit"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": " Makes balance transaction between two accounts",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDczOTI5MTksImV4cCI6MTY0NzQ3OTMxOX0.9TRoo3zZc6U6orKX7e8jwNyY-tVSQRe12MDH1pP5EQQ",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [
 							{
@@ -96,15 +181,36 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"amount\": 300.50, \"sourceAccount\": \"444\", \"targetAccount\": \"555\", \"userKey\": \"pass\"}"
+							"raw": "{ \"amount\": 40, \"sourceAccount\": \"111\", \"targetAccount\": \"222\", \"userKey\": \"1234\"}"
 						},
-						"url": "http://localhost:8080/api/transaction"
+						"url": {
+							"raw": "http://localhost:8080/api/transaction",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"transaction"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": " Removes an account given an id",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDc0MDI1MDcsImV4cCI6MTY0NzQ4ODkwN30.IvQT6CGrUqn4gqivUZzussUMuz4GZOB_z3BEdtyfGsw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [
 							{
@@ -112,17 +218,29 @@
 								"value": "*/*"
 							}
 						],
-						"url": "http://localhost:8080/api/account/0"
+						"url": {
+							"raw": "http://localhost:8080/api/account/0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"account",
+								"0"
+							]
+						}
 					},
 					"response": []
 				}
 			]
 		},
 		{
-			"name": "User Requests",
+			"name": "Costumer Requests",
 			"item": [
 				{
-					"name": " Inserts one user",
+					"name": "Inserts one costumer",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -137,15 +255,36 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"cpf\": \"string\", \"name\": \"string\", \"password\": \"string\"}"
+							"raw": "{ \"cpf\": \"103.402.766-22\", \"name\": \"Gui\", \"password\": \"123\"}"
 						},
-						"url": "http://localhost:8080/api/user"
+						"url": {
+							"raw": "http://localhost:8080/api/costumer",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"costumer"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "Returns a user given an id",
+					"name": "Returns a costumer given an id",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDc0MDI1MDcsImV4cCI6MTY0NzQ4ODkwN30.IvQT6CGrUqn4gqivUZzussUMuz4GZOB_z3BEdtyfGsw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -153,13 +292,35 @@
 								"value": "*/*"
 							}
 						],
-						"url": "http://localhost:8080/api/user/0"
+						"url": {
+							"raw": "http://localhost:8080/api/costumer/0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"costumer",
+								"0"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "Updates a user given an id",
+					"name": "Updates a costumers given an id",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDc0MDI1MDcsImV4cCI6MTY0NzQ4ODkwN30.IvQT6CGrUqn4gqivUZzussUMuz4GZOB_z3BEdtyfGsw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [
 							{
@@ -169,19 +330,47 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"cpf\": \"string\", \"name\": \"string\"}"
+							"raw": "{ \"cpf\": \"\", \"name\": \"\"}"
 						},
-						"url": "http://localhost:8080/api/user/0"
+						"url": {
+							"raw": "http://localhost:8080/api/costumer/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"costumer",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "Removes a user given an id",
+					"name": "Removes a costumer given an id",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDc0MDI1MDcsImV4cCI6MTY0NzQ4ODkwN30.IvQT6CGrUqn4gqivUZzussUMuz4GZOB_z3BEdtyfGsw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [
 							{
@@ -189,13 +378,35 @@
 								"value": "*/*"
 							}
 						],
-						"url": "http://localhost:8080/api/user/0"
+						"url": {
+							"raw": "http://localhost:8080/api/costumer/0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"costumer",
+								"0"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": " Returns a list of all users",
+					"name": "Returns a list of all costumers",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEb251cyBCYWNrZW5kIEFQSSIsInN1YiI6IjEiLCJpYXQiOjE2NDc0MDI1MDcsImV4cCI6MTY0NzQ4ODkwN30.IvQT6CGrUqn4gqivUZzussUMuz4GZOB_z3BEdtyfGsw",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -203,7 +414,131 @@
 								"value": "*/*"
 							}
 						],
-						"url": "http://localhost:8080/api/users"
+						"url": {
+							"raw": "http://localhost:8080/api/costumers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"costumers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authorization",
+			"item": [
+				{
+					"name": "Authorization",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"connection": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cpf\" : \"999.999.999-99\",\r\n    \"password\": \"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Actuator Requests",
+			"item": [
+				{
+					"name": "Actuator Links",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actuator Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actuator Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/info",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"info"
+							]
+						}
 					},
 					"response": []
 				}
