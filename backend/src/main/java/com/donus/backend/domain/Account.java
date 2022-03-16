@@ -23,8 +23,11 @@ public class Account implements Serializable {
     private Double balance;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", unique=true)
-    private User user;
+    @JoinColumn(name = "costumer_id", referencedColumnName = "id", unique=true)
+    private Costumer costumer;
+
+    @Column(name = "key")
+    private String key;
 
     public Account(){}
 

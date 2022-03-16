@@ -4,9 +4,6 @@ import com.donus.backend.dto.*;
 import com.donus.backend.service.AccountService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -23,8 +20,8 @@ public class AccountController {
 
     @PostMapping("/account")
     @ApiOperation(value = "Creates an account for a given user Id")
-    public ResponseEntity<Object> insertAccount(@RequestBody AccountInsertionDto accountInsertionDto) {
-        return accountService.insert(accountInsertionDto);
+    public ResponseEntity<Object> insertAccount(@RequestBody AccountInsertionDto accountInsertionDto, @RequestHeader("Authorization") String token) {
+        return accountService.insert(accountInsertionDto, token);
     }
 
     @DeleteMapping("/account/{id}")
@@ -47,8 +44,8 @@ public class AccountController {
 
     @PutMapping("/transaction")
     @ApiOperation(value = "Makes balance transaction between two accounts")
-    public ResponseEntity<Object> transactionBetweenAccounts(@RequestBody TransactionDto transactionDto) {
-        return accountService.doTransaction(transactionDto);
+    public ResponseEntity<Object> transactionBetweenAccounts(@RequestBody TransactionDto transactionDto, @RequestHeader("Authorization") String token) {
+        return accountService.doTransaction(transactionDto, token);
     }
 
     @PutMapping("/deposit")
@@ -56,7 +53,5 @@ public class AccountController {
     public ResponseEntity<Object> depositInAccount(@RequestBody DepositDto depositDto) {
         return accountService.makeDeposit(depositDto);
     }
-
-
 
 }
