@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -57,6 +58,8 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.PUT, "/api/transaction").hasRole("USER")
                 .antMatchers(HttpMethod.PUT, "/api/deposit").permitAll()
+
+                .antMatchers(HttpMethod.GET, "/actuator/**").permitAll()
 
                 .anyRequest().authenticated()
                 .and().csrf().disable()
