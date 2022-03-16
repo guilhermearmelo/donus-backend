@@ -22,6 +22,6 @@ public class AuthenticationService implements UserDetailsService {
         if(costumer.isPresent()){
             return costumer.get();
         }
-        throw new UsernameNotFoundException("Dados inválidos!");
+        throw new UsernameNotFoundException("Invalid data!");
     }
 }

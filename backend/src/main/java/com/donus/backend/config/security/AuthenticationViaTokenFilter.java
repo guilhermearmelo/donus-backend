@@ -2,7 +2,6 @@ package com.donus.backend.config.security;
 
 import com.donus.backend.domain.Costumer;
 import com.donus.backend.repository.CostumerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;

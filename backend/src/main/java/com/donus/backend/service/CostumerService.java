@@ -77,7 +77,7 @@ public class CostumerService {
             if(!m.matches())
                 throw new CpfDoesntMatchPatternException();
 
-            if(costumerRepository.findByCpf(costumerDto.getCpf()) != null )
+            if(costumerRepository.findByCpf(costumerDto.getCpf()).isPresent())
                 throw new CpfAlreadyExistsException();
 
             Costumer costumer = costumerRepository.findById(id);
@@ -165,21 +165,18 @@ public class CostumerService {
     }
 
     public Costumer parseDtoToEntity(CostumerDto costumerDto) {
-        Costumer costumer = new Costumer(costumerDto.getName(), costumerDto.getCpf());
 
-        return costumer;
+        return new Costumer(costumerDto.getName(), costumerDto.getCpf());
     }
 
     public Costumer parseDtoToEntity(CostumerInsertionDto costumerInsertionDto) {
-        Costumer costumer = new Costumer(costumerInsertionDto.getName(), costumerInsertionDto.getCpf(), costumerInsertionDto.getPassword());
 
-        return costumer;
+        return new Costumer(costumerInsertionDto.getName(), costumerInsertionDto.getCpf(), costumerInsertionDto.getPassword());
     }
 
     public CostumerDto parseEntityToDto(Costumer costumer){
-        CostumerDto costumerDto = new CostumerDto(costumer);
 
-        return costumerDto;
+        return new CostumerDto(costumer);
     }
 
 }

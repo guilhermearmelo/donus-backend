@@ -7,7 +7,6 @@ import com.donus.backend.dto.*;
 import com.donus.backend.exceptions.*;
 import com.donus.backend.repository.AccountRepository;
 import com.donus.backend.repository.CostumerRepository;
-import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,15 +39,10 @@ public class AccountService {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         try{
-            // Valida se o costumer pode usar a api
             if(!Objects.equals(tokenService.getIdCostumer(token.substring(7, token.length())), accountInsertionDto.getUserId()))
                 throw new TokenDoesntMatchAccountCredentialsException();
-//            if(!authService.validateUserPassword(accountInsertionDto.getPassword(), accountInsertionDto.getUserId()))
-//                throw new AuthenticationException();
-            // Valida se o costumer ja tem conto
             if(accountRepository.findByCostumer(accountInsertionDto.getUserId()) != null)
                 throw new CostumerAlreadyHasAnAccountException();
-            // Valida se a conta ja ta no banco
             if(accountRepository.findByCode(accountInsertionDto.getAccountId()) != null)
                 throw new AccountAlreadyExistsException();
 
@@ -65,10 +59,6 @@ public class AccountService {
             baseResponseDto.setMessage(new AccountAlreadyExistsException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.CONFLICT.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.CONFLICT);
-//        } catch (AuthenticationException e){
-//            baseResponseDto.setMessage(new AuthenticationException().getMessage());
-//            baseResponseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-//            return new ResponseEntity<>(baseResponseDto, HttpStatus.UNAUTHORIZED);
         } catch (TokenDoesntMatchAccountCredentialsException e){
             baseResponseDto.setMessage(new TokenDoesntMatchAccountCredentialsException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
@@ -136,23 +126,15 @@ public class AccountService {
         BaseResponseDto baseResponseDto = new BaseResponseDto();
 
         try{
-            // Valida se Source existe
             if(accountRepository.findByCode(transactionDto.getSourceAccount()) == null)
                 throw new AccountNotFoundException();
-            // Valida se Target existe
             if(accountRepository.findByCode(transactionDto.getTargetAccount()) == null)
                 throw new AccountNotFoundException();
-            // Valida se o costumer pode usar a api
             Account account = accountRepository.findByCode(transactionDto.getSourceAccount());
             if(!Objects.equals(tokenService.getIdCostumer(token.substring(7, token.length())), account.getCostumer().getId()))
                 throw new TokenDoesntMatchAccountCredentialsException();
-            // Valida se key da account está correta
             if(!new BCryptPasswordEncoder().matches(transactionDto.getUserKey(), account.getKey()))
                 throw new AccountKeyDoesntMatchDatabaseException();
-
-
-//            if(!authService.validateUserAccount(transactionDto.getSourceAccount(), transactionDto.getUserKey()))
-//                throw new AuthenticationException();
 
             Account source = accountRepository.findByCode(transactionDto.getSourceAccount());
             Account target = accountRepository.findByCode(transactionDto.getTargetAccount());
@@ -189,10 +171,6 @@ public class AccountService {
             baseResponseDto.setMessage(new AmountDoesntMatchPatternException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
             return new ResponseEntity<>(baseResponseDto, HttpStatus.BAD_REQUEST);
-//        } catch(AuthenticationException e){
-//            baseResponseDto.setMessage(new AuthenticationException().getMessage());
-//            baseResponseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-//            return new ResponseEntity<>(baseResponseDto, HttpStatus.UNAUTHORIZED);
         } catch (TokenDoesntMatchAccountCredentialsException e){
             baseResponseDto.setMessage(new TokenDoesntMatchAccountCredentialsException().getMessage());
             baseResponseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
@@ -210,10 +188,8 @@ public class AccountService {
 
         try{
 
-            // Valida se Target existe
             if(accountRepository.findByCode(depositDto.getTargetAccount()) == null)
                 throw new AccountNotFoundException();
-            // Valida valor do deposito
             if(!((0<amount)&&(amount<=2000)))
                 throw new WrongValueForDepositException();
 
@@ -237,9 +213,8 @@ public class AccountService {
     }
 
     public Account parseDtoToEntity(AccountDto accountDto) {
-        Account account = new Account(accountDto.getCode(), accountDto.getBalance());
 
-        return account;
+        return new Account(accountDto.getCode(), accountDto.getBalance());
     }
 
     public Account parseDtoToEntity(AccountInsertionDto accountInsertionDto) {
@@ -251,9 +226,8 @@ public class AccountService {
     }
 
     public AccountDto parseEntityToDto(Account account){
-        AccountDto accountDto = new AccountDto(account);
 
-        return accountDto;
+        return new AccountDto(account);
     }
 
 }
