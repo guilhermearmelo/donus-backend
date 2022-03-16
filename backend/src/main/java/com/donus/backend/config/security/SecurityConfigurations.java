@@ -45,16 +45,17 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, "/auth").permitAll()
 
-                .antMatchers(HttpMethod.POST, "/api/costumer").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/costumers").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/costumer/*").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT, "/api/costumer/*").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/costumer/*").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/costumers").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/costumer").permitAll()
 
-                .antMatchers(HttpMethod.POST, "/api/account").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/api/account/*").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/account/*").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
-                .antMatchers(HttpMethod.GET, "/api/account/*").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/account").hasRole("USER")
+
 
                 .antMatchers(HttpMethod.PUT, "/api/transaction").hasRole("USER")
                 .antMatchers(HttpMethod.PUT, "/api/deposit").permitAll()
@@ -65,5 +66,10 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().addFilterBefore(new AuthenticationViaTokenFilter(tokenService, costumerRepository), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/**.html", "/v2/api-docs", "/webjars/**", "/configuration/**", "/swagger-resources/**");
     }
 }
